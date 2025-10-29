@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -7,41 +9,42 @@ import java.util.Scanner;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-//        One();
-        // boolean, short, double, float, char, long, String
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Введи розмір масиву: ");
-        int n = Integer.parseInt(scanner.nextLine());
+        int answer = 0;
+        Scanner s = new Scanner(System.in);
 
-        int [] array = new int[n];
+        Map<String, Integer> stats = new HashMap<String, Integer>();
 
-        for (int i = 0; i < n; i++) {
-            array[i] = GetRandom(0, 100);
-        }
+        stats.put("Correct", 0);
+        stats.put("Wrong", 0);
 
-        for (var item : array) {
-            System.out.print(item + "\t");
-        }
+        do {
+             int a = GenerateNumber(1, 9);
+             int b = GenerateNumber(1, 9);
+
+            System.out.println(a + " * " + b + " = ?");
+
+             answer = Integer.parseInt(s.nextLine());
+
+            if (IsCorrectAnswer(answer, a, b)) {
+                stats.put("Correct", stats.get("Correct") + 1);
+            } else if (answer != 0) {
+                stats.put("Wrong", stats.get("Wrong") + 1);
+            }
+
+        } while (answer != 0);
+
+        System.out.println("Correct: " + stats.get("Correct"));
+        System.out.println("Wrong: " + stats.get("Wrong"));
 
     }
 
-    public static void One() {
-        int age;
+    public static int GenerateNumber(int min, int max) {
+        Random r = new Random();
 
-        System.out.println("Слава Україні");
-        System.out.println("Скіки років:");
-
-        Scanner scanner = new Scanner(System.in);
-        String str = scanner.nextLine();
-
-        age = Integer.parseInt(str);
-
-        System.out.println("Вам зараз " + str);
+        return r.nextInt(max - min + 1) + min;
     }
 
-    public static int GetRandom(int min, int max) {
-        Random random = new Random();
-
-        return random.nextInt(max - min + 1) + min;
+    public static boolean IsCorrectAnswer(int userInput, int a, int b) {
+        return userInput == a * b;
     }
 }
