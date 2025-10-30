@@ -71,33 +71,31 @@ public class Main {
             t.setDaemon(true);
             return t;
         });
+
         Future<String> lineFuture = inputExec.submit(() -> scanner.nextLine());
-        ScheduledExecutorService ticker = Executors.newSingleThreadScheduledExecutor();
-        final int[] left = {seconds};
-        Runnable r = () -> {
-            System.out.printf("\r\u001B[36mTime left: %2ds\u001B[0m ", left[0]--);
-            System.out.flush();
-        };
-        ticker.scheduleAtFixedRate(r, 0, 1, TimeUnit.SECONDS);
         try {
-            String line = lineFuture.get(seconds, TimeUnit.SECONDS);
-            ticker.shutdownNow();
-            inputExec.shutdownNow();
-            System.out.print("\r");
-            try { return Integer.parseInt(line.trim()); } catch (Exception e) { return -1; }
-        } catch (TimeoutException e) {
-            lineFuture.cancel(true);
-            ticker.shutdownNow();
-            inputExec.shutdownNow();
-            System.out.print("\r");
-            System.out.println();
-            resetScanner();
-            return null;
+            for (int i = seconds; i > 0; i--) {
+                if (lineFuture.isDone()) break;
+                System.out.print("\rTime left: " + i + "s ");
+                System.out.flush();
+                Thread.sleep(1000);
+            }
+
+            if (lineFuture.isDone()) {
+                String line = lineFuture.get();
+                try { return Integer.parseInt(line.trim()); } catch (Exception e) { return -1; }
+            } else {
+                lineFuture.cancel(true);
+                System.out.println("\nTime's up!");
+                resetScanner();
+                return null;
+            }
+
         } catch (Exception e) {
-            ticker.shutdownNow();
+            return -1;
+        } finally {
             inputExec.shutdownNow();
             System.out.print("\r");
-            return -1;
         }
     }
 
